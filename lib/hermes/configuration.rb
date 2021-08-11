@@ -6,7 +6,7 @@ module Hermes
 
     def initialize
       @tracepoint_scope = nil
-      @rspec_enabled = ENV['CI_MERGE_REQUEST_ID'] == '0'
+      @rspec_enabled = !ENV['CI_MERGE_REQUEST_REF_PATH'].nil?
     end
 
     def rspec_enabled?
