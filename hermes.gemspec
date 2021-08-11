@@ -2,7 +2,7 @@ $:.push File.expand_path("../lib", __FILE__)
 require "hermes/version"
 
 Gem::Specification.new do |s|
-  s.name        = 'Hermes'
+  s.name        = 'hermes'
   s.date        = '2021-08-11'
   s.version     = Hermes::VERSION
   s.summary     = 'Test impact analysis framework used at H1'
