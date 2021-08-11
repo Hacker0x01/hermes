@@ -7,7 +7,7 @@ require 'pastel'
 require 'json'
 
 class KnapsackSourceFileGenerator
-  RAILS_ROOT = File.expand_path(__FILE__)
+  RAILS_ROOT = Dir.getwd
   KNAPSACK_SOURCE_FILE = 'knapsack_test_source_file'
   LOG_FILE = 'knapsack_test_source_file.log'
   NOOP_SPEC = 'spec/integration/tia_noop_spec.rb'

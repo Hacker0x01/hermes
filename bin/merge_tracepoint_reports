@@ -6,7 +6,7 @@
 require 'pastel'
 require 'tempfile'
 
-RAILS_ROOT = File.expand_path(__FILE__)
+RAILS_ROOT = Dir.getwd
 ESCAPED_RAILS_ROOT = "#{RAILS_ROOT}/".gsub('/', '\/')
 pastel = Pastel.new(enabled: true)
 
