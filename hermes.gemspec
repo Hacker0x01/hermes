@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.description = "Hermes is HackerOne's homegrown test impact analysis framework used for selective test running and dependency analysis."
   s.authors     = ["Alexander Jeurissen"]
   s.email       = 'alexander@hackerone.com'
-  s.files       = `git ls-files`.split("\n")
+  s.files       = `git ls-files -- lib/*`.split("\n")
   s.executables = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.homepage    = 'https://github.com/Hacker0x01/hermes'
   s.license     = 'MIT'
