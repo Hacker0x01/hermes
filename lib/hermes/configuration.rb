@@ -3,6 +3,7 @@
 module Hermes
   class Configuration
     attr_accessor :tracepoint_scope
+    attr_accessor :rspec_enabled
 
     def initialize
       @tracepoint_scope = nil
