@@ -1,0 +1,225 @@
+# rubocop project specific cop configurations.
+# To configure rubocop-rails update ./.rubocop/.rubocop-rails.yml
+
+inherit_from:
+  - .rubocop_todo.yml
+  - ./.rubocop/.rubocop.yml
+  - ./.rubocop/.rubocop_rails.yml
+
+# Cops configuration goes below this line.
+
+require:
+  - ./lib/rubocop/cop/hackerone/mail
+  - ./lib/rubocop/cop/hackerone/pavlov_interact
+  - ./lib/rubocop/cop/hackerone/destructive_methods
+  - ./lib/rubocop/cop/hackerone/deliver_later
+  - ./lib/rubocop/cop/hackerone/active_job_base
+  - ./lib/rubocop/cop/hackerone/public_schema
+  - ./lib/rubocop/cop/hackerone/graphql_non_classy
+  - ./lib/rubocop/cop/hackerone/graphql_functions
+  - ./lib/rubocop/cop/hackerone/feature_checks
+  - ./lib/rubocop/cop/hackerone/path_lookup
+  - rubocop-rails
+
+AllCops:
+  TargetRubyVersion: 2.4
+  SuggestExtensions: false
+  Exclude:
+    - Gemfile
+    - bin/**/*
+    - lib/support/bin/**/*
+    - tmp/**/*
+    - config/**/*
+    - lib/support/config/**/*
+    - node_modules/**/*
+    - misc/node_modules/**/*
+    - lib/api-docs/node_modules/**/*
+    - scripts/**/*
+    - services/researcher-vpn/db/**/*
+
+Lint/InterpolationCheck:
+  Exclude:
+    - "lib/hackerone/slack/messages/*"
+
+Layout/LineLength:
+  Max: 120
+  Exclude:
+    - db/**/*
+    - spec/**/*
+    - features/**/*
+    - lib/tasks/**/*
+  IgnoredPatterns:
+    - '\s*#\s.*'
+
+Layout/EmptyLineAfterMagicComment:
+  Exclude:
+    - db/data_schema.rb
+
+Style/FrozenStringLiteralComment:
+  Exclude:
+    - db/data_schema.rb
+
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: comma
+
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: comma
+
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: comma
+
+Hackerone/DestructiveMethods:
+  Exclude:
+    - spec/**/*
+    - features/**/*
+    - db/**/*
+
+RSpec/AnyInstance:
+  Enabled: false
+
+RSpec/ContextWording:
+  Enabled: false
+
+RSpec/DescribedClass:
+  EnforcedStyle: explicit
+
+RSpec/LetSetup:
+  Enabled: false
+
+RSpec/MessageSpies:
+  Enabled: false
+
+RSpec/VerifiedDoubles:
+  Enabled: false
+
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+
+Lint/BinaryOperatorWithIdenticalOperands:
+  Enabled: true
+
+Lint/DuplicateRescueException:
+  Enabled: true
+
+Lint/EmptyConditionalBody:
+  Enabled: true
+
+Lint/FloatComparison:
+  Enabled: true
+
+Lint/MissingSuper:
+  Enabled: false
+
+Lint/OutOfRangeRegexpRef:
+  Enabled: true
+
+Lint/SelfAssignment:
+  Enabled: true
+
+Lint/TopLevelReturnWithArgument:
+  Enabled: true
+
+Lint/UnreachableLoop:
+  Enabled: true
+
+Style/ExplicitBlockArgument:
+  Enabled: false
+
+Style/GlobalStdStream:
+  Enabled: true
+
+Style/OptionalBooleanParameter:
+  Enabled: false
+
+Style/SingleArgumentDig:
+  Enabled: true
+
+Style/StringConcatenation:
+  Enabled: true
+
+# Offense count: 2
+# Configuration parameters: .
+# SupportedStyles: snake_case, camelCase
+Naming/MethodName:
+  EnforcedStyle: snake_case
+  Exclude:
+    - "lib/hackerone/graph_ql/filters/replace_table_with_secure_subquery.rb"
+    - "lib/hackerone/protected_attribute/transpiler/replace_self_where.rb"
+
+# Offense count: 10
+Naming/PredicateName:
+  NamePrefix:
+    - is_
+    - have_
+  ForbiddenPrefixes:
+    - is_
+    - have_
+
+Layout/EmptyLinesAroundAttributeAccessor:
+  Enabled: false
+
+Layout/SpaceAroundMethodCallOperator:
+  Enabled: false
+
+Lint/DeprecatedOpenSSLConstant:
+  Enabled: false
+
+Lint/MixedRegexpCaptureTypes:
+  Enabled: false
+
+Lint/RaiseException:
+  Enabled: false
+
+Lint/StructNewOverride:
+  Enabled: false
+
+Style/AccessorGrouping:
+  Enabled: false
+
+Style/BisectedAttrAccessor:
+  Enabled: false
+
+Style/ExponentialNotation:
+  Enabled: false
+
+Style/HashEachMethods:
+  Enabled: false
+
+Style/HashTransformKeys:
+  Enabled: false
+
+Style/HashTransformValues:
+  Enabled: false
+
+Style/RedundantAssignment:
+  Enabled: false
+
+Style/RedundantFetchBlock:
+  Enabled: false
+
+Style/RedundantRegexpCharacterClass:
+  Enabled: false
+
+Style/RedundantRegexpEscape:
+  Enabled: false
+
+Style/SlicingWithRange:
+  Enabled: false
+
+Lint/DuplicateElsifCondition:
+  Enabled: false
+
+Style/ArrayCoercion:
+  Enabled: false
+
+Style/CaseLikeIf:
+  Enabled: false
+
+Style/HashAsLastArrayItem:
+  Enabled: false
+
+Style/HashLikeCase:
+  Enabled: false
+
+Style/RedundantFileExtensionInRequire:
+  Enabled: false

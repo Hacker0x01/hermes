@@ -1,0 +1,229 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'pastel'
+require 'json'
+
+class KnapsackSourceFileGenerator
+  RAILS_ROOT = File.expand_path(__FILE__)
+  KNAPSACK_SOURCE_FILE = 'knapsack_test_source_file'
+  LOG_FILE = 'knapsack_test_source_file.log'
+  NOOP_SPEC = 'spec/integration/tia_noop_spec.rb'
+  REASONS = [
+    GEMFILE_CHANGED = 'GEMFILE_CHANGED',
+    PACKAGE_JSON_CHANGED = 'PACKAGE_JSON_CHANGED',
+    GITLAB_YAML_CHANGED = 'GITLAB_YAML_CHANGED',
+    NOT_MR_PIPELINE = 'NOT_MR_PIPELINE',
+    NO_CHANGES = 'NO_CHANGES',
+    OK = 'OK',
+    MISS = 'MISS',
+  ]
+
+  STRATEGIES = [
+    SELECTIVE = 'SELECTIVE',
+    COMPLETE = 'COMPLETE',
+    NONE = 'NONE',
+  ]
+
+  REASON_DESCRIPTION = {
+    GEMFILE_CHANGED => "[HERMES] Gemfile changed. "\
+        "running complete test_suite",
+    PACKAGE_JSON_CHANGED => "[HERMES] Package.json changed. "\
+        "running complete test_suite",
+    GITLAB_YAML_CHANGED => "[HERMES] gitlab-ci.yml changed. "\
+        "running complete test_suite",
+    NOT_MR_PIPELINE => "[HERMES] Pipeline ref is not a merge_request. "\
+        "running complete test_suite",
+    NO_CHANGES => "[HERMES] No files changed. "\
+        "skipping integration specs",
+  }
+
+  attr_accessor :report_path, :pastel
+
+  def initialize(report_path)
+    @pastel = Pastel.new(enabled: true)
+    @report_path = report_path
+
+    fail "report_path `#{report_path}` not found" unless File.exist?(report_path)
+
+    if changed_files.any?
+      puts pastel.on_blue.bold.white('[HERMES] git diff origin/develop:').to_s
+      puts changed_files
+    end
+
+    @test_cases = []
+    @strategy, @reason = determine_strategy
+
+    case @strategy
+    when SELECTIVE
+      generate_call_graph
+
+      @reason = @test_cases.empty? ? MISS : OK
+    when NONE
+      puts pastel.on_yellow.bold.black(REASON_DESCRIPTION[@reason]).to_s
+
+      # NOTE: ensures we dont run complete test suite
+      # if we don't have any call_graph hits.
+      # empty test_cases results in knapsack running complete test suite
+      # this prevents that
+      @test_cases = [NOOP_SPEC]
+    else
+      puts pastel.on_yellow.bold.black(REASON_DESCRIPTION[@reason]).to_s
+
+      @test_cases = [] # ensures we run the complete test suite
+    end
+
+    write_log
+    write
+  end
+
+  def generate_call_graph
+    @test_cases |= affected_test_cases_for_changed_files
+
+    # NOTE: When developers change spec files we want
+    # to run the complete spec.
+    #
+    # In that case we don't want to also run the selective specs
+    # in the same file.
+    if new_and_modified_test_cases.any?
+      @test_cases.delete_if do |test_case|
+        new_and_modified_test_cases.include?(test_case.split('[').first)
+      end
+    end
+
+    @test_cases |= new_and_modified_test_cases
+
+    puts pastel.on_blue.bold.white(
+      "[HERMES] Which matches #{@test_cases.count} test_cases.",
+    ).to_s
+  end
+
+  def write
+    file = File.open("#{RAILS_ROOT}/#{KNAPSACK_SOURCE_FILE}", 'w')
+    @test_cases.each { |test_case| file.puts test_case }
+    file.close
+    puts pastel.on_green.bold.black("[HERMES] knapsack_source_file generated").to_s
+  end
+
+  def write_log
+    file = File.open("#{RAILS_ROOT}/#{LOG_FILE}", 'w')
+    file.puts @reason
+    file.close
+    puts pastel.on_cyan.bold.white("[HERMES] knapsack_source_file.log written").to_s
+  end
+
+  private
+
+  # NOTE: we check for changes in ruby dependencies
+  # by looking at git diffs in Gemfile, Gemfile.lock
+  def includes_ruby_dependency_upgrades?
+    changed_files.include?('Gemfile') ||
+      changed_files.include?('Gemfile.lock')
+  end
+
+  # NOTE: we check for changes in Javascript dependencies
+  # by looking at git diffs in Package.json, yarn.lock
+  def includes_javascript_dependency_upgrades?
+    changed_files.include?('package.json') ||
+      changed_files.include?('yarn.lock')
+  end
+
+  # NOTE: we check for changes in Gitlab pipeline configuration
+  # by looking at git diffs in gitlab-ci.yml
+  def includes_gitlab_configuration_changes?
+    changed_files.include?('gitlab-ci.yml')
+  end
+
+  # NOTE: we only run selective specs for MR pipelines.
+  # GL sets an env variable that we can use to determine
+  # if the execution context is a MR pipeline or not.
+  def merge_request_pipeline?
+    ENV['CI_MERGE_REQUEST_REF_PATH']
+  end
+
+  # NOTE: if all other criteria are met, and there are
+  # no .rb file changes then there is no point in running
+  # integration specs.
+  def has_rb_file_changes?
+    changed_files.any? { |file| file.end_with?(".rb") }
+  end
+
+  # NOTE: determine the execution strategy.
+  # Based on this we will either run specs selectively,
+  # or the complete test suite. We also return the reason
+  # why the strategy has been chosen
+  def determine_strategy
+    return [COMPLETE, GEMFILE_CHANGED] if includes_ruby_dependency_upgrades?
+    return [COMPLETE, PACKAGE_JSON_CHANGED] if includes_javascript_dependency_upgrades?
+    return [COMPLETE, GITLAB_YAML_CHANGED] if includes_gitlab_configuration_changes?
+    return [COMPLETE, NOT_MR_PIPELINE] unless merge_request_pipeline?
+    return [NONE, NO_CHANGES] unless has_rb_file_changes?
+
+    [SELECTIVE, OK]
+  end
+
+  # NOTE: git_changed_files is populated in the before_script
+  # of the .specs definition at .gitlab-ci.yml:125
+  def changed_files
+    @changed_files ||= begin
+      File.read('git_changed_files').split(/\n/)
+    rescue Errno::ENOENT
+      [] # we return an empty array if the file does not exist (should not happen)
+    end
+  end
+
+  # NOTE: return test_cases that were newly introduced or changed
+  # We'll have to run these in addition to affected files
+  def new_and_modified_test_cases
+    @new_and_modified_test_cases ||= changed_files.filter do |file|
+      # NOTE: add back if we roll-out source file generation for spec:acceptance
+      # next true if file.end_with? '.feature'
+
+      next true if file.end_with? '_spec.rb'
+
+      false
+    end
+  end
+
+  # NOTE: create a inverted lookup hash based on
+  # the codepath reports.
+  #
+  # These are stored as { id => [path_1, path_2] }
+  # We want them as { path_1: [id_1], path_2: [id_2] }
+  #
+  # This will after initial inversion result in subsequent O(1) lookup
+  def lookup_tbl
+    return @lookup_tbl if @lookup_tbl
+
+    lookup_tbl ||= {}
+
+    report_json = JSON.parse(File.read(report_path))
+
+    report_json.each do |test_case, code_paths|
+      code_paths.each do |code_path|
+        lookup_tbl[code_path] ||= []
+
+        next unless File.exist?(test_case.split('[').first)
+
+        lookup_tbl[code_path] << test_case
+      end
+    end
+
+    @lookup_tbl = lookup_tbl
+  end
+
+  # NOTE: find affected test_cases using inverted lookup tbl
+  def affected_test_cases_for_changed_files
+    test_cases ||= []
+
+    changed_files.each do |file|
+      next unless lookup_tbl.key?(file)
+
+      test_cases |= lookup_tbl[file]
+    end
+
+    test_cases
+  end
+end
+
+KnapsackSourceFileGenerator.new(ARGV.shift)
