@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# Copyright 2021 HackerOne Inc.
+#
 # frozen_string_literal: true
 
 require 'pastel'

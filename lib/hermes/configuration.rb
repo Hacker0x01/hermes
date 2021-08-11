@@ -1,3 +1,5 @@
+# Copyright 2021 HackerOne Inc.
+#
 module Hermes
   class Configuration
     attr_accessor :tracepoint_scope

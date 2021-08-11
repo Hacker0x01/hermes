@@ -1,3 +1,5 @@
+# Copyright 2021 HackerOne Inc.
+#
 # frozen_string_literal: true
 
 # rubocop:disable Style/GlobalVars

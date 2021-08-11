@@ -1,3 +1,5 @@
+# Copyright 2021 HackerOne Inc.
+#
 require 'hermes/configuration'
 require 'hermes/version'
 
