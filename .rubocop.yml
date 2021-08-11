@@ -1,63 +1,11 @@
-# rubocop project specific cop configurations.
-# To configure rubocop-rails update ./.rubocop/.rubocop-rails.yml
-
-inherit_from:
-  - .rubocop_todo.yml
-  - ./.rubocop/.rubocop.yml
-  - ./.rubocop/.rubocop_rails.yml
-
-# Cops configuration goes below this line.
-
-require:
-  - ./lib/rubocop/cop/hackerone/mail
-  - ./lib/rubocop/cop/hackerone/pavlov_interact
-  - ./lib/rubocop/cop/hackerone/destructive_methods
-  - ./lib/rubocop/cop/hackerone/deliver_later
-  - ./lib/rubocop/cop/hackerone/active_job_base
-  - ./lib/rubocop/cop/hackerone/public_schema
-  - ./lib/rubocop/cop/hackerone/graphql_non_classy
-  - ./lib/rubocop/cop/hackerone/graphql_functions
-  - ./lib/rubocop/cop/hackerone/feature_checks
-  - ./lib/rubocop/cop/hackerone/path_lookup
-  - rubocop-rails
-
 AllCops:
   TargetRubyVersion: 2.4
   SuggestExtensions: false
-  Exclude:
-    - Gemfile
-    - bin/**/*
-    - lib/support/bin/**/*
-    - tmp/**/*
-    - config/**/*
-    - lib/support/config/**/*
-    - node_modules/**/*
-    - misc/node_modules/**/*
-    - lib/api-docs/node_modules/**/*
-    - scripts/**/*
-    - services/researcher-vpn/db/**/*
-
-Lint/InterpolationCheck:
-  Exclude:
-    - "lib/hackerone/slack/messages/*"
 
 Layout/LineLength:
   Max: 120
-  Exclude:
-    - db/**/*
-    - spec/**/*
-    - features/**/*
-    - lib/tasks/**/*
   IgnoredPatterns:
     - '\s*#\s.*'
-
-Layout/EmptyLineAfterMagicComment:
-  Exclude:
-    - db/data_schema.rb
-
-Style/FrozenStringLiteralComment:
-  Exclude:
-    - db/data_schema.rb
 
 Style/TrailingCommaInArrayLiteral:
   EnforcedStyleForMultiline: comma
@@ -67,12 +15,6 @@ Style/TrailingCommaInHashLiteral:
 
 Style/TrailingCommaInArguments:
   EnforcedStyleForMultiline: comma
-
-Hackerone/DestructiveMethods:
-  Exclude:
-    - spec/**/*
-    - features/**/*
-    - db/**/*
 
 RSpec/AnyInstance:
   Enabled: false
@@ -137,14 +79,10 @@ Style/SingleArgumentDig:
 Style/StringConcatenation:
   Enabled: true
 
-# Offense count: 2
 # Configuration parameters: .
 # SupportedStyles: snake_case, camelCase
 Naming/MethodName:
   EnforcedStyle: snake_case
-  Exclude:
-    - "lib/hackerone/graph_ql/filters/replace_table_with_secure_subquery.rb"
-    - "lib/hackerone/protected_attribute/transpiler/replace_self_where.rb"
 
 # Offense count: 10
 Naming/PredicateName:
