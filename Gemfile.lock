@@ -1,3 +1,8 @@
+PATH
+  remote: .
+  specs:
+    Hermes (0.0.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -14,6 +19,7 @@ PLATFORMS
   x86_64-darwin-20
 
 DEPENDENCIES
+  Hermes!
   pastel (~> 0.8.0)
   pry (~> 0.14.1)
 
