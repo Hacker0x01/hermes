@@ -16,7 +16,7 @@ RSpec.configure do |config|
   RSPEC_TRACEPOINT_REPORT = "#{Rails.root}/knapsack_rspec_tracepoint_report.json"
 
   config.around do |example|
-    Hermes::Tracers::Tracepoint.enable { example.run }
+    Hermes::Tracers::Tracepoint.enable(test_id: example.example.id) { example.run }
   end
 
   # NOTE: this occurs after a knapsack node finishes executing
