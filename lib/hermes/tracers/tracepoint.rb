@@ -50,7 +50,7 @@ module Hermes
 
         tracer.enable { yield }
 
-        report[test_id] = traces.keys
+        report[test_id] = buffer.keys
       end
     end
   end
