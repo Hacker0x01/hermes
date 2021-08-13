@@ -5,7 +5,7 @@ require 'hermes/version'
 
 module Hermes
   class << self
-    attr_accessor :configuration
+    attr_accessor :configuration, :pastel
   end
 
   def self.configuration
@@ -14,6 +14,10 @@ module Hermes
 
   def self.reset
     @configuration = Configuration.new
+  end
+
+  def self.pastel
+    @pastel ||= Pastel.new(enabled: true)
   end
 
   def self.configure
