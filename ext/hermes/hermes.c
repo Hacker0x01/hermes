@@ -99,7 +99,6 @@ Stop(VALUE self) {
   if (!is_started)
     return Qfalse;
 
-  buffer = Qnil;
   disable_tracepoints(self);
   is_started = 0;
 
