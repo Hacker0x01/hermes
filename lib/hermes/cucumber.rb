@@ -2,26 +2,26 @@
 #
 # frozen_string_literal: true
 
+require 'pastel'
 require 'json'
 require 'pry'
 require 'hermes/tracers/tracepoint'
 
-RSpec.configure do |config|
-  next unless Hermes.configuration.rspec_enabled?
-
+if Hermes.configuration.cucumber_tracing_enabled?
   pastel = Hermes.pastel
-  puts pastel.bold.blue('[HERMES] rspec tracing enabled').to_s
+  puts pastel.bold.blue('[HERMES] cucumber tracing enabled').to_s
 
-  RSPEC_TRACEPOINT_REPORT = "#{Rails.root}/knapsack_rspec_tracepoint_report.json"
+  CUCUMBER_TRACEPOINT_REPORT = \
+    "#{Rails.root}/knapsack_cucumber_tracepoint_report.json"
 
-  config.around do |example|
-    Hermes::Tracers::Tracepoint.trace(test_id: example.example.id) { example.run }
+  Around do |scenario, block|
+    Hermes::Tracers::Tracepoint.trace(test_id: scenario.test_id) { block.call }
   end
 
   # NOTE: this occurs after a knapsack node finishes executing
   # write the $rspec_tracepoint_report to disk
   at_exit do
-    file = File.open(RSPEC_TRACEPOINT_REPORT, 'w')
+    file = File.open(CUCUMBER_TRACEPOINT_REPORT, 'w')
     file.puts Hermes::Tracers::Tracepoint.report.to_json
     file.close
 
@@ -29,3 +29,4 @@ RSpec.configure do |config|
     Hermes::Tracers::Tracepoint.reset
   end
 end
+

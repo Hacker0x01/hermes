@@ -89,8 +89,6 @@ Start(VALUE self) {
   register_tracepoints(self);
   is_started = 1;
 
-  printf("traces in start: %d\n", RARRAY_LENINT(tracepoints));
-
   return Qtrue;
 }
 
@@ -101,8 +99,6 @@ Stop(VALUE self) {
 
   disable_tracepoints(self);
   is_started = 0;
-
-  printf("traces in stop: %d\n", RARRAY_LENINT(tracepoints));
 
   return Qtrue;
 }

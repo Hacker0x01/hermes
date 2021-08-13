@@ -2,15 +2,19 @@
 #
 module Hermes
   class Configuration
-    attr_accessor :tracepoint_scope
     attr_accessor :rspec_enabled
+    attr_accessor :cucumber_enabled
 
     def initialize
-      @tracepoint_scope = nil
       @rspec_enabled = !ENV['CI_MERGE_REQUEST_REF_PATH'].nil?
+      @cucumber_enabled = !ENV['CI_MERGE_REQUEST_REF_PATH'].nil?
     end
 
-    def rspec_enabled?
+    def rspec_tracing_enabled?
+      @rspec_enabled == true
+    end
+
+    def cucumber_tracing_enabled?
       @rspec_enabled == true
     end
   end
