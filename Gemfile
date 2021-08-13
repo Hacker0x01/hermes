@@ -8,4 +8,4 @@ gemspec
 
 gem "pastel", "~> 0.8.0"
 
-gem "ffi", "~> 1.15"
+gem "rake-compiler", "~> 1.1"

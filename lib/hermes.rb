@@ -2,6 +2,7 @@
 #
 require 'hermes/configuration'
 require 'hermes/version'
+require 'hermes/hermes'
 
 module Hermes
   class << self
