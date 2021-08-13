@@ -3,7 +3,6 @@
 # include <stdio.h>
 # include "hermes.h"
 
-// static VALUE tracing = Qfalse;
 static VALUE tracepoints = Qnil;
 static VALUE buffer = Qnil;
 
@@ -46,8 +45,8 @@ register_tracepoints(VALUE self) {
 
   UNUSED(self);
 
-  if (NIL_P(traces))
-  {
+  if (NIL_P(traces)) {
+    printf("traces is nil pointer\n");
     int call_msk = RUBY_EVENT_CALL;
 
     VALUE tpCall = rb_tracepoint_new(Qnil, call_msk, call_event, 0);
@@ -62,10 +61,10 @@ register_tracepoints(VALUE self) {
     rb_tracepoint_enable(rb_ary_entry(traces, i));
 }
 
-/* Clear tracepoints */
+/* Disable tracepoints */
 /* taken from Byebug.c */
 static void
-clear_tracepoints(VALUE self) {
+disable_tracepoints(VALUE self) {
   int i;
 
   UNUSED(self);
@@ -85,11 +84,9 @@ Start(VALUE self) {
 
 static VALUE
 Stop(VALUE self) {
-  UNUSED(self);
+  buffer = rb_hash_new();
+  disable_tracepoints(self);
 
-  clear_tracepoints(self);
-
-  tracepoints = Qnil;
   return Qtrue;
 }
 
