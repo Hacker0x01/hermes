@@ -7,7 +7,7 @@ require 'pry'
 require 'hermes/tracers/tracepoint'
 
 RSpec.configure do |config|
-  next unless Hermes.configuration.rspec_enabled?
+  next unless Hermes.configuration.rspec_tracing_enabled?
 
   pastel = Hermes.pastel
   puts pastel.bold.blue('[HERMES] rspec tracing enabled').to_s
