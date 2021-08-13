@@ -5,6 +5,7 @@
 
 static VALUE tracepoints = Qnil;
 static VALUE buffer = Qnil;
+static int is_started = 0;
 
 static VALUE
 Buffer(VALUE self) {
@@ -14,8 +15,7 @@ Buffer(VALUE self) {
 }
 
 static VALUE
-Add_to_buffer(VALUE self, VALUE value)
-{
+Add_to_buffer(VALUE self, VALUE value) {
   UNUSED(self);
 
   if (TYPE(value) != T_STRING)
@@ -46,7 +46,6 @@ register_tracepoints(VALUE self) {
   UNUSED(self);
 
   if (NIL_P(traces)) {
-    printf("traces is nil pointer\n");
     int call_msk = RUBY_EVENT_CALL;
 
     VALUE tpCall = rb_tracepoint_new(Qnil, call_msk, call_event, 0);
@@ -73,19 +72,38 @@ disable_tracepoints(VALUE self) {
     rb_tracepoint_disable(rb_ary_entry(tracepoints, i));
 }
 
+static VALUE
+Started(VALUE self) {
+  UNUSED(self);
+
+  return is_started ? Qtrue : Qfalse;
+}
+
 /* NOTE: start tracing */
 static VALUE
 Start(VALUE self) {
+  if (is_started)
+    return Qfalse;
+
   buffer = rb_hash_new();
   register_tracepoints(self);
+  is_started = 1;
+
+  printf("traces in start: %d\n", RARRAY_LENINT(tracepoints));
 
   return Qtrue;
 }
 
 static VALUE
 Stop(VALUE self) {
-  buffer = rb_hash_new();
+  if (!is_started)
+    return Qfalse;
+
+  buffer = Qnil;
   disable_tracepoints(self);
+  is_started = 0;
+
+  printf("traces in stop: %d\n", RARRAY_LENINT(tracepoints));
 
   return Qtrue;
 }
@@ -98,5 +116,6 @@ void Init_hermes(void) {
 
   rb_define_singleton_method(Native, "buffer", Buffer, 0);
   rb_define_singleton_method(Native, "start", Start, 0);
+  rb_define_singleton_method(Native, "started", Started, 0);
   rb_define_singleton_method(Native, "stop", Stop, 0);
 };
