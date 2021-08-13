@@ -89,6 +89,7 @@ Stop(VALUE self) {
 
   clear_tracepoints(self);
 
+  tracepoints = Qnil;
   return Qtrue;
 }
 
