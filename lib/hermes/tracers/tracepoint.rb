@@ -21,11 +21,11 @@ module Hermes
       end
 
       def self.trace(test_id:)
-        Hermes::Native.start
+        HermesNative.start
         yield
-        Hermes::Native.stop
+        HermesNative.stop
 
-        report[test_id] = Hermes::Native.buffer.keys
+        report[test_id] = HermesNative.buffer.keys
       end
     end
   end

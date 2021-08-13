@@ -111,11 +111,13 @@ Stop(VALUE self) {
 
 // NOTE: Map functions to ruby module
 void Init_hermes(void) {
-  VALUE Hermes = rb_define_module("Hermes");
-  VALUE Native = rb_define_class_under(Hermes, "Native", rb_cObject);
+  VALUE HermesNative = rb_define_module("HermesNative");
 
-  rb_define_singleton_method(Native, "buffer", Buffer, 0);
-  rb_define_singleton_method(Native, "start", Start, 0);
-  rb_define_singleton_method(Native, "started", Started, 0);
-  rb_define_singleton_method(Native, "stop", Stop, 0);
+  rb_define_module_function(HermesNative, "buffer", Buffer, 0);
+  rb_define_module_function(HermesNative, "start", Start, 0);
+  rb_define_module_function(HermesNative, "started", Started, 0);
+  rb_define_module_function(HermesNative, "stop", Stop, 0);
+
+  rb_global_variable(&tracepoints);
+  rb_global_variable(&buffer);
 };
