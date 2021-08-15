@@ -11,11 +11,15 @@ if Hermes.configuration.cucumber_tracing_enabled?
   pastel = Hermes.pastel
   puts pastel.bold.blue('[HERMES] cucumber tracing enabled').to_s
 
+  RAILS_ROOT = Rails.root.to_s
   CUCUMBER_TRACEPOINT_REPORT = \
-    "#{Rails.root}/knapsack_cucumber_tracepoint_report.json"
+    "#{RAILS_ROOT}/knapsack_cucumber_tracepoint_report.json"
 
   Around do |scenario, block|
-    Hermes::Tracers::Tracepoint.trace(test_id: scenario.test_id) { block.call }
+    Hermes::Tracers::Tracepoint.trace(
+      root: RAILS_ROOT,
+      test_id: scenario.test_id
+    ) { block.call }
   end
 
   # NOTE: this occurs after a knapsack node finishes executing

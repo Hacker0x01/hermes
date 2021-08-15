@@ -51,11 +51,14 @@ register_tracepoints(VALUE self) {
 
   if (NIL_P(traces)) {
     int call_msk = RUBY_EVENT_CALL;
+    int class_msk = RUBY_EVENT_CLASS;
 
     VALUE tpCall = rb_tracepoint_new(Qnil, call_msk, call_event, 0);
+    VALUE tpClass = rb_tracepoint_new(Qnil, class_msk, call_event, 0);
 
     traces = rb_ary_new();
     rb_ary_push(traces, tpCall);
+    rb_ary_push(traces, tpClass);
 
     tracepoints = traces;
   }

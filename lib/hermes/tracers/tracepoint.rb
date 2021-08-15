@@ -20,7 +20,8 @@ module Hermes
         @report = {}
       end
 
-      def self.trace(test_id:)
+      def self.trace(root:, test_id:)
+        HermesNative.set_rails_root(root)
         HermesNative.start
         yield
         HermesNative.stop
