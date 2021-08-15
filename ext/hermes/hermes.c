@@ -5,6 +5,7 @@
 
 static VALUE tracepoints = Qnil;
 static VALUE buffer = Qnil;
+static char *rails_root = NULL;
 static int is_started = 0;
 
 static VALUE
@@ -14,15 +15,14 @@ Buffer(VALUE self) {
   return buffer;
 }
 
-static VALUE
-Add_to_buffer(VALUE self, VALUE value) {
-  UNUSED(self);
+static int
+starts_with(const char *pre, const char *str) {
+  return strncmp(pre, str, strlen(pre)) == 0;
+}
 
-  if (TYPE(value) != T_STRING)
-    rb_raise(rb_eTypeError, "value of a buffer entry must be String");
-
-  rb_hash_aset(buffer, rb_str_dup(value), INT2FIX(0));
-  return value;
+static void
+add_to_buffer(const char *path) {
+  rb_hash_aset(buffer, rb_str_new2(path), INT2FIX(0));
 };
 
 /* TODO: is this the main callback func for tracepoint ? */
@@ -32,8 +32,12 @@ call_event(VALUE trace_point, void *data) {
   trace_arg = rb_tracearg_from_tracepoint(trace_point);
 
   VALUE rb_path = rb_tracearg_path(trace_arg);
+  const char *path = NIL_P(rb_path) ? "" : RSTRING_PTR(rb_path);
 
-  Add_to_buffer(Qnil, rb_path);
+  if (!starts_with(rails_root, path))
+    return;
+
+  add_to_buffer(path);
 };
 
 /* Setup TracePoint functionality */
@@ -86,6 +90,7 @@ Start(VALUE self) {
     return Qfalse;
 
   buffer = rb_hash_new();
+
   register_tracepoints(self);
   is_started = 1;
 
@@ -103,12 +108,20 @@ Stop(VALUE self) {
   return Qtrue;
 }
 
+static VALUE
+SetRailsRoot(VALUE self, VALUE value) {
+  rails_root = RSTRING_PTR(value);
+
+  return Qtrue;
+}
+
 
 // NOTE: Map functions to ruby module
 void Init_hermes(void) {
   VALUE HermesNative = rb_define_module("HermesNative");
 
   rb_define_module_function(HermesNative, "buffer", Buffer, 0);
+  rb_define_module_function(HermesNative, "set_rails_root", SetRailsRoot, 1);
   rb_define_module_function(HermesNative, "start", Start, 0);
   rb_define_module_function(HermesNative, "started", Started, 0);
   rb_define_module_function(HermesNative, "stop", Stop, 0);
