@@ -13,7 +13,7 @@ RSpec.configure do |config|
   puts pastel.bold.blue('[HERMES] rspec tracing enabled').to_s
 
   RAILS_ROOT = Rails.root.to_s
-  RSPEC_TRACEPOINT_REPORT = "#{Rails_ROOT}/knapsack_rspec_tracepoint_report.json"
+  RSPEC_TRACEPOINT_REPORT = "#{RAILS_ROOT}/knapsack_rspec_tracepoint_report.json"
 
   config.around do |example|
     Hermes::Tracers::Tracepoint.trace(
