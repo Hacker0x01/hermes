@@ -6,8 +6,9 @@ module Hermes
     attr_accessor :cucumber_enabled
 
     def initialize
-      @rspec_enabled = !ENV['CI_MERGE_REQUEST_REF_PATH'].nil?
-      @cucumber_enabled = !ENV['CI_MERGE_REQUEST_REF_PATH'].nil?
+      ci = !ENV['CI'].nil?
+      @rspec_enabled = ci && !ENV['CI_MERGE_REQUEST_REF_PATH'].nil?
+      @cucumber_enabled = ci && !ENV['CI_MERGE_REQUEST_REF_PATH'].nil?
     end
 
     def rspec_tracing_enabled?
