@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    Hermes (0.0.1)
+    hermes (0.0.2)
 
 GEM
   remote: https://rubygems.org/
@@ -13,15 +13,19 @@ GEM
     pry (0.14.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
+    rake (13.0.6)
+    rake-compiler (1.1.1)
+      rake
     tty-color (0.6.0)
 
 PLATFORMS
   x86_64-darwin-20
 
 DEPENDENCIES
-  Hermes!
+  hermes!
   pastel (~> 0.8.0)
   pry (~> 0.14.1)
+  rake-compiler (~> 1.1)
 
 BUNDLED WITH
    2.2.15
